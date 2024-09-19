@@ -1,0 +1,15 @@
+directorio="/root/backup"
+if [ ! -d "$directorio" ]; then 
+mkdir -p "$directorio"
+echo "Directorio de backup creado: $directorio"
+fi
+
+usario_mysql="root"
+pass="123456789a"
+base_de_datos="pruba"
+fecha=$(date +"%Y%m%d_%H%M%S")
+archivo_backup="$directorio/${base_de_datos}_backup_$fecha.sql"
+
+mysqldump -u$usuario_mysql $base_de_datos > $archivo_backup
+
+echo "backup completado: $archivo_backup"

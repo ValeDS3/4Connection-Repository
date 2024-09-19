@@ -1,0 +1,25 @@
+echo "Formato de cron:"
+echo "* * * * *"
+echo "| | | | |"
+echo "| | | | +---- Día de la semana (0 - 7) (Domingo=0 o 7)"
+echo "| | | +------ Mes (1 - 12)"
+echo "| | +-------- Día del mes (1 - 31)"
+echo "| +---------- Hora (0 - 23)"
+echo "+------------ Minuto (0 - 59)"
+echo 
+
+read -p "Introduce la ruta completa del script de backup: " RUTA
+if [ ! -f "$RUTA" ]; then
+  echo "Error: El script de backup no existe en la ruta especificada."
+  echo $RUTA
+  exit 1
+fi
+
+read -p "Introduce la programación de cron (formato: minuto hora día_mes mes día_semana): " HORARIO
+
+CRONTAB="${HORARIO} ${RUTA}"
+
+
+(crontab -l 2>/dev/null; echo "$CRONTAB") | crontab -
+
+echo "Entrada de cron añadida: $CRONTAB"
