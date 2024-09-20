@@ -1,0 +1,7 @@
+create dabase passusuario;
+use passusuario;
+create table pass(
+ idusuario INT not null,
+hashpass varchar(255) not null,
+primary key (idusuario)
+);
