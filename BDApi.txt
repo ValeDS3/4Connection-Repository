@@ -1,7 +1,0 @@
-create datebase pruebaapi2
-create table post(
-Id int not null auto_increment,
-Texto varchar (50) not null,
-Fec_horahapub DATETIME not null,
-primary key (Id)
-);
