@@ -1,0 +1,208 @@
+create database proyecto;
+use proyecto;
+create table usuario(					/*hecho*/
+	idusuario int auto_increment,
+	nombre varchar(20) not null,
+	fechaNac date not null,
+	descripcion varchar(50),
+    /*FotoPerfil mediumblob,*/
+	primary key (idusuario)
+);
+
+create table Post(					/*hecho*/
+	idpost int auto_increment,
+	idusuario int not null,
+	urlvideo text,
+	texto text,
+    fecha datetime not null,
+	primary key (idpost),
+	foreign key (idusuario) references usuario(idusuario)
+);
+SELECT * FROM Post;
+
+
+alter table Post
+CHANGE fecha fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+create table grupo(										/*hecho*/
+	codigogrupo int auto_increment,
+	nombregrupo varchar(20) not null,
+	usuariocreador int not null,
+	descripcion varchar(50),
+	/*pp_grupos mediumblob,*/
+	codigoinvitacion text not null,
+	primary key (codigogrupo),
+	unique key (codigo_invitacion),
+    foreign key (usuario_creador) references usuario(idusuario)
+);
+
+create table grupoUsuarios(					/*hecho*/
+	codigoGrupo int not null,
+	idUsuario int not null,
+	primary key (codigoGrupo, idUsuario),
+	foreign key (codigoGrupo) references grupo(codigoGrupo),
+	foreign key (idUsuario) references usuario(idUsuario)
+);
+
+create table evento(								/*hecho*/
+	idevento int auto_increment,
+	fecha_hora_comienza datetime not null,
+	fecha_hora_termina datetime not null,
+	portada mediumblob,
+	descripcion text,
+	idusuario int not null,
+    codigoGrupo int,
+	primary key (idevento),
+	foreign key (idusuario) references usuario(idusuario),
+    foreign key (codigoGrupo) references grupo(codigoGrupo)
+);
+select * from evento;
+alter table evento
+CHANGE fecha_hora_comienza fechahoracomienza datetime not null;
+
+alter table evento
+CHANGE fecha_hora_termina fechahoratermina datetime not null;
+
+alter table evento
+drop column portada;
+
+create table eventoUsuarios(						/*hecho*/
+	idEvento int not null,
+    idUsuario int not null,
+    primary key (idEvento, idUsuario),
+    foreign key (idEvento) references Evento(idEvento),
+    foreign key (idUsuario) references usuario(idUsuario)
+);
+select * from eventoUsuarios;
+create table postimagen(
+	idPost int not null,
+	imagen mediumblob not null,
+    idimagen int auto_increment not null,
+	primary key (idpost, idimagen),
+    unique key (idimagen),
+	foreign key (idpost) references post(idpost)
+);
+
+create table postetiqueta(               /*hecho*/
+	idpost int not null,
+	etiqueta varchar(20),
+	primary key (idpost, etiqueta),
+	foreign key (idpost) references post(idpost)
+);
+select * from postetiqueta;
+
+create table postgrupo(                  /*hecho*/
+	idpostgrupo int not null,
+	idusuario int not null,
+	codigogrupo int not null,
+	primary key (idpostgrupo),
+	foreign key (idusuario) references usuario(idusuario),
+	foreign key (codigogrupo) references grupo(codigogrupo)
+);
+select * from postgrupo;
+alter table postgrupo
+change idpostgrupo idpostgrupo int auto_increment;
+
+create table postpublico(
+	idpostpublico int not null,
+	idusuario int not null,
+	primary key (idpostpublico),
+	foreign key (idusuario) references usuario(idusuario)
+);
+
+create table chatea( 				/*hecho*/
+	Emisor int not null,
+	Receptor int not null,
+    Fecha datetime not null,
+	primary key (Emisor, Receptor, Fecha),
+	foreign key (Emisor) references usuario(idusuario),
+    foreign key (Receptor) references usuario(idusuario)
+);
+select * from chatea;
+alter table chatea 
+change Fecha Fecha datetime default current_timestamp;
+create table interactua(
+	idpostpublico int not null,
+	idusuario int not null,
+	primary key (idpostpublico),
+	foreign key (idpostpublico) references postpublico(idpostpublico),
+	foreign key (idusuario) references usuario(idusuario)
+);
+
+create table interactuacomentarios(
+	idPostPublico int not null,
+	idusuario int not null,
+	comentarios text not null,
+	primary key (idpostpublico, idusuario, comentarios(255)),
+	foreign key (idPostPublico) references interactua(idpostpublico),
+	foreign key (idusuario) references interactua(idusuario)
+);
+
+create table interactualikes(
+	idpostpublico int not null,
+	idusuario int not null,
+	primary key (idpostpublico, idusuario),
+	foreign key (idpostpublico) references interactua(idpostpublico),
+	foreign key (idusuario) references interactua(idusuario)
+);
+
+/*create table interactuacompartidos(
+	idpostpublico int not null,
+	idusuario int not null,
+	compartidos int not null,
+	primary key (idpostpublico, idusuario, compartidos),
+	foreign key (idpostpublico) references interactua(idpostpublico),
+	foreign key (idusuario) references interactua(idusuario)
+);*/
+
+create table reacciona(
+	idpostgrupo int not null,
+	idusuario int not null,
+    codigogrupo int not null,
+	primary key (idpostgrupo, idUsuario, codigogrupo),
+	foreign key (idpostgrupo) references postgrupo(idpostgrupo),
+    foreign key (codigogrupo) references grupo(codigogrupo),
+	foreign key (idusuario) references usuario(idusuario)
+);
+
+create table reaccionacomentarios(
+	idpostgrupo int not null,
+	idusuario int not null,
+    codigogrupo int not null,
+    comentarios text not null,
+    primary key (idpostgrupo, idusuario, codigogrupo, comentarios(255)),
+    foreign key (idpostgrupo) references reacciona(idpostgrupo),
+    foreign key (idusuario) references reacciona(idusuario),
+    foreign key (codigogrupo) references reacciona(codigogrupo)
+);
+
+create table reaccionalikes(
+	idpostgrupo int not null,
+	idusuario int not null,
+    codigogrupo int not null,
+    primary key (idpostgrupo, idusuario, codigogrupo),
+    foreign key (idpostgrupo) references reacciona(idpostgrupo),
+    foreign key (idusuario) references reacciona(idusuario),
+    foreign key (codigogrupo) references reacciona(codigogrupo)
+);
+
+/*create table reaccionacompartidos(
+	idpostgrupo int not null,
+	idusuario int not null,
+    codigogrupo int not null,
+    compartidos int not null,
+    primary key (idpostgrupo, idusuario, codigogrupo, compartidos),
+    foreign key (idpostgrupo) references reacciona(idpostgrupo),
+    foreign key (idusuario) references reacciona(idusuario),
+    foreign key (codigogrupo) references reacciona(codigogrupo)
+);*/
+
+create table SeVincula(
+	idEvento int not null,
+    idPostEvento int not null,
+    idUsuario int not null,
+    primary key (idEvento, idPostEvento, idUsuario),
+    foreign key (idEvento) references Evento(idEvento),
+    foreign key (idPostEvento) references Post(idPost),
+    foreign key (idUsuario) references Usuario(idUsuario)
+);
